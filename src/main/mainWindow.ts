@@ -261,13 +261,14 @@ function initDevtoolsListeners(win: BrowserWindow) {
 }
 
 function initStaticTitle(win: BrowserWindow) {
+    win.setTitle("Vesktop Canary");
     const listener = (e: { preventDefault: Function }) => e.preventDefault();
 
     if (Settings.store.staticTitle) win.on("page-title-updated", listener);
 
     addSettingsListener("staticTitle", enabled => {
         if (enabled) {
-            win.setTitle("Vesktop");
+            win.setTitle("Vesktop Canary");
             win.on("page-title-updated", listener);
         } else {
             win.off("page-title-updated", listener);
@@ -317,7 +318,6 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
     const noFrame = frameless === true || customTitleBar === true;
     const backgroundColor =
         splashTheming !== false ? splashBackground : nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
-
     const options: BrowserWindowConstructorOptions = {
         show: Settings.store.enableSplashScreen === false && !CommandLine.values["start-minimized"],
         backgroundColor,
@@ -333,6 +333,7 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
         },
         frame: !noFrame,
         autoHideMenuBar: enableMenu,
+        icon: join(__dirname, "build", "icon.ico"),
         ...getWindowBoundsOptions()
     };
 
@@ -351,7 +352,7 @@ function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
     }
 
     if (staticTitle) {
-        options.title = "Vesktop";
+        options.title = "Vesktop Canary";
     }
 
     if (process.platform === "darwin") {
