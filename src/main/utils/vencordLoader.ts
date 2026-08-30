@@ -29,7 +29,22 @@ export interface ReleaseData {
     assets: Array<{
         name: string;
         browser_download_url: string;
+        updated_at: string;
     }>;
+}
+
+/**
+ * Vencord publishes to a rolling "devbuild" tag and re-uploads the assets, so the tag alone
+ * never changes. Key the installed version on the newest asset timestamp instead.
+ */
+export function getReleaseVersionKey({ tag_name, assets }: ReleaseData) {
+    const newest = assets
+        .filter(({ name }) => FILES_TO_DOWNLOAD.some(f => name.startsWith(f)))
+        .map(a => a.updated_at)
+        .sort()
+        .at(-1);
+
+    return newest ? `${tag_name}@${newest}` : tag_name;
 }
 
 export async function githubGet(endpoint: string) {
@@ -51,7 +66,8 @@ async function fetchLatestRelease(): Promise<ReleaseData> {
 }
 
 export async function downloadVencordFiles(release?: ReleaseData) {
-    const { assets, tag_name } = release ?? (await fetchLatestRelease());
+    release ??= await fetchLatestRelease();
+    const { assets } = release;
 
     const wanted = assets.filter(({ name }) => FILES_TO_DOWNLOAD.some(f => name.startsWith(f)));
 
@@ -70,7 +86,7 @@ export async function downloadVencordFiles(release?: ReleaseData) {
         wanted.map(({ name }) => rename(join(VENCORD_FILES_DIR, `${name}.download`), join(VENCORD_FILES_DIR, name)))
     );
 
-    State.store.vencordVersion = tag_name;
+    State.store.vencordVersion = getReleaseVersionKey(release);
 }
 
 let inFlightUpdateCheck: Promise<VencordUpdateResult> | undefined;
@@ -100,20 +116,21 @@ export function checkVencordUpdate(force = false): Promise<VencordUpdateResult> 
 async function doCheckVencordUpdate(): Promise<VencordUpdateResult> {
     try {
         const release = await fetchLatestRelease();
+        const latest = getReleaseVersionKey(release);
         const current = State.store.vencordVersion;
 
-        // installs from before version tracking existed: adopt the current tag rather than re-downloading
+        // installs from before version tracking existed: adopt the current version rather than re-downloading
         if (current === undefined) {
-            State.store.vencordVersion = release.tag_name;
-            return { status: "up-to-date", version: release.tag_name };
+            State.store.vencordVersion = latest;
+            return { status: "up-to-date", version: latest };
         }
 
-        if (current === release.tag_name) return { status: "up-to-date", version: current };
+        if (current === latest) return { status: "up-to-date", version: current };
 
         await downloadVencordFiles(release);
-        console.log(`[VencordLoader] Updated Vencord ${current ?? "(unknown)"} -> ${release.tag_name}`);
+        console.log(`[VencordLoader] Updated Vencord ${current} -> ${latest}`);
 
-        return { status: "updated", from: current, to: release.tag_name };
+        return { status: "updated", from: current, to: latest };
     } catch (err) {
         console.error("[VencordLoader] Failed to check for Vencord update:", err);
         return { status: "error", error: err instanceof Error ? err.message : String(err) };

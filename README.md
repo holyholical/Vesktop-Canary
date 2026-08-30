@@ -27,3 +27,14 @@ Everything upstream Vesktop has (WebRTC IP handling policy, `--user-agent-os`, `
 ## Building
 
 Same as upstream: `pnpm i`, then `pnpm build` / `pnpm start`. See the [Vesktop README](https://github.com/Vencord/Vesktop#building-from-source) for platform details.
+
+### Running on musl (Alpine, Gentoo musl, Void musl, Chimera)
+
+The Electron binary npm downloads is glibc-only and segfaults in `ld.so` on musl. Alpine builds Electron against musl, so:
+
+```sh
+pnpm setup:musl   # downloads Alpine's electron + the few libs your system lacks into .electron-musl/
+pnpm start:musl   # pnpm build, then launch with it (start:musl:dev for a dev build)
+```
+
+Nothing is installed system-wide; delete `.electron-musl/` to undo. Alpine's Electron may lag the version pinned in `package.json`, which is fine for development. Known gap: `@vencord/venmic` ships glibc prebuilds, so screenshare audio needs venmic built against musl.
