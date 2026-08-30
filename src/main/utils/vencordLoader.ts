@@ -5,7 +5,7 @@
  */
 
 import { mkdirSync } from "fs";
-import { access, constants as FsConstants, writeFile } from "fs/promises";
+import { access, constants as FsConstants, rename, writeFile } from "fs/promises";
 import { VENCORD_FILES_DIR } from "main/vencordFilesDir";
 import { join } from "path";
 
@@ -53,16 +53,27 @@ async function fetchLatestRelease(): Promise<ReleaseData> {
 export async function downloadVencordFiles(release?: ReleaseData) {
     const { assets, tag_name } = release ?? (await fetchLatestRelease());
 
+    const wanted = assets.filter(({ name }) => FILES_TO_DOWNLOAD.some(f => name.startsWith(f)));
+
+    // download next to the live files, then swap in, so a window reloading mid-download never reads a partial script
     await Promise.all(
-        assets
-            .filter(({ name }) => FILES_TO_DOWNLOAD.some(f => name.startsWith(f)))
-            .map(({ name, browser_download_url }) =>
-                downloadFile(browser_download_url, join(VENCORD_FILES_DIR, name), {}, { retryOnNetworkError: true })
+        wanted.map(({ name, browser_download_url }) =>
+            downloadFile(
+                browser_download_url,
+                join(VENCORD_FILES_DIR, `${name}.download`),
+                {},
+                { retryOnNetworkError: true }
             )
+        )
+    );
+    await Promise.all(
+        wanted.map(({ name }) => rename(join(VENCORD_FILES_DIR, `${name}.download`), join(VENCORD_FILES_DIR, name)))
     );
 
     State.store.vencordVersion = tag_name;
 }
+
+let inFlightUpdateCheck: Promise<VencordUpdateResult> | undefined;
 
 export type VencordUpdateResult =
     | { status: "up-to-date"; version: string }
@@ -74,13 +85,28 @@ export type VencordUpdateResult =
  * Downloads the newest Vencord release if it is newer than the one on disk.
  * New files take effect on the next launch. Custom Vencord dirs are never touched.
  */
-export async function checkVencordUpdate(force = false): Promise<VencordUpdateResult> {
-    if (State.store.vencordDir) return { status: "skipped", reason: "custom Vencord directory in use" };
-    if (!force && !Settings.store.autoUpdateVencord) return { status: "skipped", reason: "auto update disabled" };
+export function checkVencordUpdate(force = false): Promise<VencordUpdateResult> {
+    if (State.store.vencordDir) {
+        return Promise.resolve({ status: "skipped", reason: "custom Vencord directory in use" });
+    }
+    if (!force && !Settings.store.autoUpdateVencord) {
+        return Promise.resolve({ status: "skipped", reason: "auto update disabled" });
+    }
 
+    inFlightUpdateCheck ??= doCheckVencordUpdate().finally(() => (inFlightUpdateCheck = undefined));
+    return inFlightUpdateCheck;
+}
+
+async function doCheckVencordUpdate(): Promise<VencordUpdateResult> {
     try {
         const release = await fetchLatestRelease();
         const current = State.store.vencordVersion;
+
+        // installs from before version tracking existed: adopt the current tag rather than re-downloading
+        if (current === undefined) {
+            State.store.vencordVersion = release.tag_name;
+            return { status: "up-to-date", version: release.tag_name };
+        }
 
         if (current === release.tag_name) return { status: "up-to-date", version: current };
 

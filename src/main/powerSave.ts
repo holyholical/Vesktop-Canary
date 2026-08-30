@@ -12,6 +12,10 @@ import { handle } from "./utils/ipcWrappers";
 
 let blockerId: number | undefined;
 
+export function releasePowerSaveBlocker() {
+    stop();
+}
+
 function stop() {
     if (blockerId === undefined) return;
     if (powerSaveBlocker.isStarted(blockerId)) powerSaveBlocker.stop(blockerId);

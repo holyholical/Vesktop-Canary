@@ -43,8 +43,14 @@ function initTelemetryBlocking() {
 const DOH_MODE_OFF = "off" as const;
 const DOH_MODE_SECURE = "secure" as const;
 
+let lastAppliedDoh: string | undefined;
+
 function applyDnsOverHttps() {
     const { enabled, server } = Settings.store.dnsOverHttps ?? {};
+
+    const config = JSON.stringify({ enabled, server });
+    if (config === lastAppliedDoh) return;
+    lastAppliedDoh = config;
 
     if (!enabled || !server) {
         app.configureHostResolver({ secureDnsMode: DOH_MODE_OFF, secureDnsServers: [] });
@@ -66,9 +72,7 @@ function applyDnsOverHttps() {
 function initDnsOverHttps() {
     applyDnsOverHttps();
 
-    Settings.addGlobalChangeListener((_, path) => {
-        if (path === "" || path.startsWith("dnsOverHttps")) applyDnsOverHttps();
-    });
+    Settings.addGlobalChangeListener(() => applyDnsOverHttps());
 }
 
 let isClearingCache = false;

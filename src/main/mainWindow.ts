@@ -28,6 +28,7 @@ import { DEFAULT_HEIGHT, DEFAULT_WIDTH, MIN_HEIGHT, MIN_WIDTH } from "./constant
 import { AppEvents } from "./events";
 import { sendRendererCommand } from "./ipcCommands";
 import { darwinURL } from "./main";
+import { releasePowerSaveBlocker } from "./powerSave";
 import { Settings, State, VencordSettings } from "./settings";
 import { createSplashWindow, updateSplashMessage } from "./splash";
 import { destroyTray, initTray } from "./tray";
@@ -423,6 +424,12 @@ function createMainWindow() {
     win.on("focus", () => {
         win.flashFrame(false);
     });
+
+    // the renderer owns call state; if it reloads or dies, don't keep the display awake forever
+    win.webContents.on("did-start-navigation", details => {
+        if (details.isMainFrame && !details.isSameDocument) releasePowerSaveBlocker();
+    });
+    win.webContents.on("destroyed", releasePowerSaveBlocker);
 
     initWindowBoundsListeners(win);
     if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin")

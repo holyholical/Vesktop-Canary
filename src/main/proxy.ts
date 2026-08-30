@@ -48,6 +48,7 @@ export function parseProxyUrl(raw: string): ParsedProxy | { error: string } {
 }
 
 let credentials: { username: string; password: string } | undefined;
+let lastAppliedConfig: string | undefined;
 
 /** --proxy-server is a native Chromium switch and always wins over the setting */
 const hasCliProxy = () => app.commandLine.hasSwitch("proxy-server");
@@ -61,7 +62,13 @@ async function applyProxy() {
     const ses = session.defaultSession;
     const { enabled, url, bypassRules } = Settings.store.proxy ?? {};
 
+    // settings listeners fire for every change, so only touch the network stack when the proxy config changed
+    const config = JSON.stringify({ enabled, url, bypassRules });
+    if (config === lastAppliedConfig) return;
+    lastAppliedConfig = config;
+
     credentials = undefined;
+    proxyAuthAttempts.clear();
 
     if (!enabled || !url) {
         await ses.setProxy({ mode: "system" });
@@ -106,17 +113,28 @@ export async function testProxy(): Promise<{ ok: true; ms: number } | { ok: fals
     }
 }
 
+/** Chromium re-emits "login" if the proxy rejects the credentials; answering forever would spin */
+const MAX_PROXY_AUTH_ATTEMPTS = 2;
+const proxyAuthAttempts = new Map<string, number>();
+
 export function initProxy() {
-    app.on("login", (event, _webContents, _details, authInfo, callback) => {
+    app.on("login", (event, _webContents, details, authInfo, callback) => {
         if (!authInfo.isProxy || !credentials) return;
+
+        const key = `${authInfo.host}:${authInfo.port}`;
+        const attempts = (proxyAuthAttempts.get(key) ?? 0) + 1;
+        proxyAuthAttempts.set(key, attempts);
+
+        if (attempts > MAX_PROXY_AUTH_ATTEMPTS) {
+            console.error(`[Proxy] Proxy ${key} rejected the configured credentials (${details.url})`);
+            return;
+        }
 
         event.preventDefault();
         callback(credentials.username, credentials.password);
     });
 
-    Settings.addGlobalChangeListener((_, path) => {
-        if (path === "" || path.startsWith("proxy")) applyProxy();
-    });
+    Settings.addGlobalChangeListener(() => applyProxy());
 
     return applyProxy();
 }
