@@ -33,6 +33,7 @@ export const DefaultVesktopSettings: Settings = {
     transparencyOption: "none",
 
     platformSpoof: "auto",
+    clientSpoof: "web",
     blockTelemetry: true,
     clearCacheOnExit: false,
     clearSessionOnExit: false,

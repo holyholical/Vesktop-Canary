@@ -13,6 +13,7 @@ Vesktop-Canary is a fork of [Vesktop](https://github.com/Vencord/Vesktop) that s
 | --- | --- |
 | Proxy support (http, https, socks4, socks5, with credentials), bypass rules, connection test, WebRTC kill switch so voice can't bypass the proxy | Settings > Privacy |
 | Platform spoofing (Windows / macOS / Linux): user agent, client hints, `navigator.platform` | Settings > Privacy |
+| Client type spoofing (desktop app / Android / iOS): what the platform indicator shows other users | Settings > Privacy |
 | Telemetry blocking (science, track, metrics, Sentry) | Settings > Privacy (on by default) |
 | DNS over HTTPS (Quad9, Cloudflare, Mullvad, Google, custom) | Settings > Privacy |
 | Timezone and locale spoofing | Settings > Privacy |

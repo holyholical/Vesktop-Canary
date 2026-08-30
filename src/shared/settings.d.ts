@@ -44,6 +44,11 @@ export interface Settings {
 
     /** Which OS Discord should think it is running on. "auto" uses the real platform */
     platformSpoof: "auto" | "windows" | "linux" | "darwin";
+    /**
+     * What kind of client Discord (and other users, via the platform indicator) should see.
+     * "web" is what Vesktop naturally reports. Desktop uses the OS from platformSpoof.
+     */
+    clientSpoof: "web" | "desktop" | "android" | "ios";
     /** Block Discord analytics (science/track/metrics) and Sentry crash reports */
     blockTelemetry: boolean;
     /** Wipe the HTTP cache when Vesktop exits */

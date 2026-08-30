@@ -12,6 +12,7 @@ import { getValueAndOnChange, Settings, useSettings } from "renderer/settings";
 import { isMac } from "renderer/utils";
 
 import { AutoStartToggle } from "./AutoStartToggle";
+import { ClientSpoofPicker } from "./ClientSpoofPicker";
 import { DeveloperOptionsButton } from "./DeveloperOptions";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { DnsOverHttpsSettings } from "./DnsOverHttpsSettings";
@@ -157,6 +158,7 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
                 "Wipes cookies, local storage and your login when Vesktop quits. You will have to log in again every start (token login works well with this)."
         },
         PlatformSpoofPicker,
+        ClientSpoofPicker,
         FingerprintSettings,
         ProxySettings,
         DnsOverHttpsSettings
