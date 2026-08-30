@@ -8,6 +8,8 @@ import { app } from "electron";
 import { existsSync, mkdirSync } from "fs";
 import { dirname, join } from "path";
 
+import { CommandLine } from "./cli";
+
 const vesktopDir = dirname(process.execPath);
 
 export const PORTABLE =
@@ -15,10 +17,17 @@ export const PORTABLE =
     !process.execPath.toLowerCase().endsWith("electron.exe") &&
     !existsSync(join(vesktopDir, "Uninstall Vesktop.exe"));
 
-export const DATA_DIR =
+const BASE_DATA_DIR =
     process.env.VENCORD_USER_DATA_DIR || (PORTABLE ? join(vesktopDir, "Data") : join(app.getPath("userData")));
 
+/** --profile <name>: a fully isolated data dir (settings, Vencord, cookies, cache, single-instance lock) */
+export const PROFILE = CommandLine.values.profile ? String(CommandLine.values.profile) : undefined;
+
+export const DATA_DIR = PROFILE ? join(BASE_DATA_DIR, "profiles", PROFILE) : BASE_DATA_DIR;
+
 mkdirSync(DATA_DIR, { recursive: true });
+// userData drives the single instance lock and a few Chromium paths, so profiles must not share it
+if (PROFILE) app.setPath("userData", DATA_DIR);
 
 export const SESSION_DATA_DIR = join(DATA_DIR, "sessionData");
 app.setPath("sessionData", SESSION_DATA_DIR);

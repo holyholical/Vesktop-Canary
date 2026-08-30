@@ -15,7 +15,10 @@ Vesktop-Canary is a fork of [Vesktop](https://github.com/Vencord/Vesktop) that s
 | Platform spoofing (Windows / macOS / Linux): user agent, client hints, `navigator.platform` | Settings > Privacy |
 | Telemetry blocking (science, track, metrics, Sentry) | Settings > Privacy (on by default) |
 | DNS over HTTPS (Quad9, Cloudflare, Mullvad, Google, custom) | Settings > Privacy |
-| Clear cache on exit | Settings > Privacy |
+| Timezone and locale spoofing | Settings > Privacy |
+| Clear cache on exit, forget session on exit (wipes cookies/login) | Settings > Privacy |
+| Client hint scrubbing (arch, bitness, model, full version list) while spoofing; no Referer leaks to non-Discord hosts | automatic |
+| Isolated profiles: separate login, cookies, cache, settings per profile | `--profile <name>` |
 | Login with token | Button on the login page, and Settings > Account |
 | Mention count drawn on the tray icon | Settings > Notifications (on by default) |
 | Keep display awake in calls and while watching streams | Settings > Behaviour |

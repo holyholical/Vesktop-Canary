@@ -17,6 +17,7 @@ import { AutoStartToggle } from "./AutoStartToggle";
 import { DeveloperOptionsButton } from "./DeveloperOptions";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { DnsOverHttpsSettings } from "./DnsOverHttpsSettings";
+import { FingerprintSettings } from "./FingerprintSettings";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
 import { OutdatedVesktopWarning } from "./OutdatedVesktopWarning";
 import { PlatformSpoofPicker } from "./PlatformSpoofPicker";
@@ -151,7 +152,14 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             title: "Clear cache on exit",
             description: "Wipes cached images, media and scripts when Vesktop quits. Login stays intact."
         },
+        {
+            key: "clearSessionOnExit",
+            title: "Forget session on exit",
+            description:
+                "Wipes cookies, local storage and your login when Vesktop quits. You will have to log in again every start (token login works well with this)."
+        },
         PlatformSpoofPicker,
+        FingerprintSettings,
         ProxySettings,
         DnsOverHttpsSettings
     ],

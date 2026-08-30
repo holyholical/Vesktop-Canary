@@ -48,6 +48,12 @@ export interface Settings {
     blockTelemetry: boolean;
     /** Wipe the HTTP cache when Vesktop exits */
     clearCacheOnExit: boolean;
+    /** Wipe cookies, localStorage and the login on exit */
+    clearSessionOnExit: boolean;
+    /** IANA timezone Discord should see, e.g. "UTC". Empty = real timezone. Requires restart */
+    spoofTimezone: string;
+    /** BCP 47 locale for navigator.language / Accept-Language, e.g. "en-US". Empty = real locale. Requires restart */
+    spoofLocale: string;
     /** Keep the display awake while in a call or watching a stream */
     preventSleepInCalls: boolean;
     /** Go idle based on system-wide input activity instead of activity inside the Discord window */

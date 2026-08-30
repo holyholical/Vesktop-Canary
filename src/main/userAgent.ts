@@ -8,6 +8,7 @@ import { session } from "electron";
 import type { Settings as TSettings } from "shared/settings";
 
 import { CommandLine } from "./cli";
+import { DISCORD_HOSTNAMES } from "./constants";
 import { Settings } from "./settings";
 
 export type SpoofablePlatform = Exclude<TSettings["platformSpoof"], "auto">;
@@ -94,7 +95,26 @@ export function getPlatformInfo(): PlatformInfo {
     };
 }
 
-const CLIENT_HINT_HEADERS = ["sec-ch-ua-platform", "sec-ch-ua-platform-version"];
+/** Every hint that can contradict the spoofed platform or narrow down the machine */
+const CLIENT_HINT_HEADERS = [
+    "sec-ch-ua-platform",
+    "sec-ch-ua-platform-version",
+    "sec-ch-ua-arch",
+    "sec-ch-ua-bitness",
+    "sec-ch-ua-model",
+    "sec-ch-ua-wow64",
+    "sec-ch-ua-full-version",
+    "sec-ch-ua-full-version-list",
+    "sec-ch-ua-form-factors"
+];
+
+function isDiscordHost(url: string) {
+    try {
+        return DISCORD_HOSTNAMES.includes(new URL(url).hostname);
+    } catch {
+        return false;
+    }
+}
 
 /**
  * Applies the user agent to the whole session so popouts and plain HTTP requests match,
@@ -105,11 +125,23 @@ export function initUserAgent() {
     ses.setUserAgent(getBrowserUserAgent());
 
     ses.webRequest.onBeforeSendHeaders((details, callback) => {
-        if (!isSpoofingPlatform()) return callback({});
+        // Discord pages open external links in-app (popouts) only with openLinksWithElectron;
+        // never tell those sites which Discord page they came from
+        const referer = Object.keys(details.requestHeaders).find(k => k.toLowerCase() === "referer");
+        const stripReferer =
+            referer !== undefined && !isDiscordHost(details.url) && isDiscordHost(details.requestHeaders[referer]);
+
+        if (!isSpoofingPlatform()) {
+            if (!stripReferer) return callback({});
+            const { [referer]: _dropped, ...requestHeaders } = details.requestHeaders;
+            return callback({ requestHeaders });
+        }
 
         const platform = getEffectivePlatform();
         const requestHeaders = Object.fromEntries(
-            Object.entries(details.requestHeaders).filter(([k]) => !CLIENT_HINT_HEADERS.includes(k.toLowerCase()))
+            Object.entries(details.requestHeaders).filter(
+                ([k]) => !CLIENT_HINT_HEADERS.includes(k.toLowerCase()) && !(stripReferer && k === referer)
+            )
         );
 
         const hasPlatformHint = Object.keys(details.requestHeaders).some(k => k.toLowerCase() === "sec-ch-ua-platform");

@@ -46,8 +46,15 @@ const options = {
     repair: {
         type: "boolean",
         description: "Repair the application by re-downloading the latest Vencord files"
+    },
+    profile: {
+        type: "string",
+        argumentName: "name",
+        description: "Use an isolated profile (own settings, login, cookies and cache). Letters, digits, - and _ only"
     }
 } satisfies Record<string, Option>;
+
+const PROFILE_NAME_PATTERN = /^[\w-]{1,64}$/;
 
 // only for help display
 const extraOptions = {
@@ -133,6 +140,12 @@ export function checkCommandLineForHelpOrVersion() {
 
         console.log(base + "\n" + optionsHelp);
         app.exit(0);
+    }
+
+    const { profile } = CommandLine.values;
+    if (profile != null && !PROFILE_NAME_PATTERN.test(String(profile))) {
+        console.error("Invalid --profile name. Use letters, digits, - and _ only (max 64 chars)");
+        app.exit(1);
     }
 
     for (const [name, def] of Object.entries(options)) {

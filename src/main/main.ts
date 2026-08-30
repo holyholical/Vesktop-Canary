@@ -17,7 +17,7 @@ import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
-import { initPrivacy } from "./privacy";
+import { applyLocaleAndTimezoneSpoof, initPrivacy } from "./privacy";
 import { initProxy } from "./proxy";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
@@ -36,6 +36,7 @@ export let enableHardwareAcceleration = true;
 
 function init() {
     setAsDefaultProtocolClient("discord");
+    applyLocaleAndTimezoneSpoof();
 
     const { disableSmoothScroll, hardwareAcceleration, hardwareVideoAcceleration } = Settings.store;
 

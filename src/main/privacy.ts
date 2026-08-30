@@ -75,24 +75,61 @@ function initDnsOverHttps() {
     Settings.addGlobalChangeListener(() => applyDnsOverHttps());
 }
 
-let isClearingCache = false;
+let isClearingOnExit = false;
 
-function initClearCacheOnExit() {
+function initClearOnExit() {
     app.on("will-quit", event => {
-        if (!Settings.store.clearCacheOnExit || isClearingCache) return;
+        const { clearCacheOnExit, clearSessionOnExit } = Settings.store;
+        if ((!clearCacheOnExit && !clearSessionOnExit) || isClearingOnExit) return;
 
-        isClearingCache = true;
+        isClearingOnExit = true;
         event.preventDefault();
 
-        Promise.all([session.defaultSession.clearCache(), session.defaultSession.clearCodeCaches({})])
-            .catch(err => console.error("[Privacy] Failed to clear cache on exit:", err))
+        const ses = session.defaultSession;
+        const tasks: Promise<unknown>[] = [];
+        if (clearCacheOnExit) tasks.push(ses.clearCache(), ses.clearCodeCaches({}));
+        // everything that identifies the session: cookies, localStorage (token), IndexedDB, service workers
+        if (clearSessionOnExit) tasks.push(ses.clearStorageData(), ses.clearAuthCache());
+
+        Promise.all(tasks)
+            .then(() => console.log("[Privacy] Cleared on exit:", { clearCacheOnExit, clearSessionOnExit }))
+            .catch(err => console.error("[Privacy] Failed to clear data on exit:", err))
             .finally(() => app.quit());
     });
+}
+
+const TIMEZONE_PATTERN = /^[A-Za-z_]+(?:\/[A-Za-z0-9_+-]+){0,2}$/;
+const LOCALE_PATTERN = /^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/;
+
+/**
+ * Chromium reads TZ at startup and --lang before ready, so these cannot change at runtime.
+ * Discord sends the locale in X-Super-Properties and reads the timezone through Intl.
+ */
+export function applyLocaleAndTimezoneSpoof() {
+    const { spoofTimezone, spoofLocale } = Settings.store;
+
+    if (spoofTimezone) {
+        if (TIMEZONE_PATTERN.test(spoofTimezone)) {
+            process.env.TZ = spoofTimezone;
+            console.log("[Privacy] Timezone spoofed to", spoofTimezone);
+        } else {
+            console.error("[Privacy] Ignoring invalid spoofTimezone:", spoofTimezone);
+        }
+    }
+
+    if (spoofLocale) {
+        if (LOCALE_PATTERN.test(spoofLocale)) {
+            app.commandLine.appendSwitch("lang", spoofLocale);
+            console.log("[Privacy] Locale spoofed to", spoofLocale);
+        } else {
+            console.error("[Privacy] Ignoring invalid spoofLocale:", spoofLocale);
+        }
+    }
 }
 
 /** Must be called after app is ready */
 export function initPrivacy() {
     initTelemetryBlocking();
     initDnsOverHttps();
-    initClearCacheOnExit();
+    initClearOnExit();
 }
