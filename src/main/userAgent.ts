@@ -34,6 +34,13 @@ export const ClientHintPlatforms: Record<SpoofablePlatform, string> = {
     windows: "Windows"
 };
 
+/** Sec-CH-UA-Platform-Version values; Linux reports an empty string in Chromium */
+export const ClientHintPlatformVersions: Record<SpoofablePlatform, string> = {
+    darwin: "10.15.7",
+    linux: "",
+    windows: "10.0.0"
+};
+
 function toSpoofable(platform: string): SpoofablePlatform {
     if (platform === "win32" || platform === "windows") return "windows";
     if (platform === "darwin") return "darwin";
@@ -69,6 +76,7 @@ export interface PlatformInfo {
     spoof?: {
         navigatorPlatform: string;
         clientHintPlatform: string;
+        clientHintPlatformVersion: string;
     };
 }
 
@@ -80,7 +88,8 @@ export function getPlatformInfo(): PlatformInfo {
         platform: process.platform,
         spoof: {
             navigatorPlatform: NavigatorPlatforms[effective],
-            clientHintPlatform: ClientHintPlatforms[effective]
+            clientHintPlatform: ClientHintPlatforms[effective],
+            clientHintPlatformVersion: ClientHintPlatformVersions[effective]
         }
     };
 }
@@ -106,6 +115,12 @@ export function initUserAgent() {
         const hasPlatformHint = Object.keys(details.requestHeaders).some(k => k.toLowerCase() === "sec-ch-ua-platform");
         if (hasPlatformHint) {
             requestHeaders["sec-ch-ua-platform"] = `"${ClientHintPlatforms[platform]}"`;
+        }
+        const hasVersionHint = Object.keys(details.requestHeaders).some(
+            k => k.toLowerCase() === "sec-ch-ua-platform-version"
+        );
+        if (hasVersionHint) {
+            requestHeaders["sec-ch-ua-platform-version"] = `"${ClientHintPlatformVersions[platform]}"`;
         }
 
         callback({ requestHeaders });

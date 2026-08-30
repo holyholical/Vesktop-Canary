@@ -103,7 +103,9 @@ async function applyProxy() {
 export async function testProxy(): Promise<{ ok: true; ms: number } | { ok: false; error: string }> {
     const start = Date.now();
     try {
-        const res = await session.defaultSession.fetch("https://discord.com/api/v9/gateway", {
+        // cache-bust, otherwise a cached response reports success without touching the proxy
+        const res = await session.defaultSession.fetch(`https://discord.com/api/v9/gateway?vesktop=${Date.now()}`, {
+            cache: "no-store",
             signal: AbortSignal.timeout(15_000)
         });
         if (!res.ok) return { ok: false, error: `Discord responded with HTTP ${res.status}` };

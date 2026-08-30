@@ -18,7 +18,11 @@ if (spoof) {
     webFrame.executeJavaScript(`(${spoofNavigatorPlatform})(${JSON.stringify(spoof)})`);
 }
 
-function spoofNavigatorPlatform(spoof: { navigatorPlatform: string; clientHintPlatform: string }) {
+function spoofNavigatorPlatform(spoof: {
+    navigatorPlatform: string;
+    clientHintPlatform: string;
+    clientHintPlatformVersion: string;
+}) {
     Object.defineProperty(Navigator.prototype, "platform", {
         get: () => spoof.navigatorPlatform,
         configurable: true
@@ -39,7 +43,8 @@ function spoofNavigatorPlatform(spoof: { navigatorPlatform: string; clientHintPl
     proto.getHighEntropyValues = function (hints: string[]) {
         return originalGetHighEntropyValues.call(this, hints).then((values: Record<string, unknown>) => ({
             ...values,
-            platform: spoof.clientHintPlatform
+            platform: spoof.clientHintPlatform,
+            ...("platformVersion" in values && { platformVersion: spoof.clientHintPlatformVersion })
         }));
     };
 }
