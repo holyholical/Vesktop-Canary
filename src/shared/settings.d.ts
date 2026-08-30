@@ -63,6 +63,8 @@ export interface Settings {
 
     proxy: {
         enabled: boolean;
+        /** Force WebRTC to only use proxied connections while the proxy is on (SOCKS/HTTP proxies don't carry UDP, so voice would otherwise leak the real IP) */
+        blockUnproxiedWebRTC: boolean;
         /** e.g. socks5://127.0.0.1:9050 or http://user:pass@proxy:3128 */
         url: string;
         /** Chromium bypass rules, comma separated */

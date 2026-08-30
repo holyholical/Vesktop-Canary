@@ -56,6 +56,14 @@ export const ProxySettings: SettingsComponent = ({ settings }) => {
                     onChange={v => (proxy.enabled = v)}
                 />
 
+                <VesktopSettingsSwitch
+                    title="Block unproxied voice (WebRTC kill switch)"
+                    description="Proxies don't carry UDP, so voice would bypass the proxy and reveal your IP. Forces WebRTC onto proxied connections while the proxy is on. Voice may not work unless the proxy supports it."
+                    value={proxy.blockUnproxiedWebRTC}
+                    onChange={v => (proxy.blockUnproxiedWebRTC = v)}
+                    disabled={!proxy.enabled}
+                />
+
                 <TextInput
                     placeholder="socks5://127.0.0.1:9050"
                     value={proxy.url}

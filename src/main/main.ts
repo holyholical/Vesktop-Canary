@@ -170,11 +170,20 @@ app.on("window-all-closed", () => {
 // Sets the WebRTC IP handling policy for all current and future windows.
 // Switching to "default_public_and_private_interfaces" may fix calls stuck at "DTLS Connecting" when using VPNs, Tailscale, etc.
 // https://github.com/Vencord/Vesktop/issues/876
-app.on("web-contents-created", (_event, contents) => {
-    contents.setWebRTCIPHandlingPolicy(Settings.store.webRTCIPHandlingPolicy ?? "default");
-});
-Settings.addChangeListener("webRTCIPHandlingPolicy", () => {
+// With a proxy on, UDP (voice) bypasses it entirely, so force WebRTC onto proxied transports only.
+function getEffectiveWebRTCPolicy() {
+    const { proxy, webRTCIPHandlingPolicy } = Settings.store;
+    if (proxy?.enabled && proxy.url && proxy.blockUnproxiedWebRTC) return "disable_non_proxied_udp";
+    return webRTCIPHandlingPolicy ?? "default";
+}
+
+function applyWebRTCPolicy() {
     for (const win of BrowserWindow.getAllWindows()) {
-        win.webContents.setWebRTCIPHandlingPolicy(Settings.store.webRTCIPHandlingPolicy ?? "default");
+        win.webContents.setWebRTCIPHandlingPolicy(getEffectiveWebRTCPolicy());
     }
+}
+
+app.on("web-contents-created", (_event, contents) => {
+    contents.setWebRTCIPHandlingPolicy(getEffectiveWebRTCPolicy());
 });
+Settings.addGlobalChangeListener(() => applyWebRTCPolicy());

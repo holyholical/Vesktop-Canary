@@ -43,6 +43,7 @@ export const DefaultVesktopSettings: Settings = {
     autoUpdateVencord: true,
     proxy: {
         enabled: false,
+        blockUnproxiedWebRTC: true,
         url: "",
         bypassRules: "<local>"
     },
