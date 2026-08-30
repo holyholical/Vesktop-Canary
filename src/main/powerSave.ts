@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { powerSaveBlocker } from "electron";
+import { powerMonitor, powerSaveBlocker, webContents } from "electron";
 import { IpcEvents } from "shared/IpcEvents";
 
 import { Settings } from "./settings";
@@ -36,3 +36,18 @@ handle(IpcEvents.POWER_SAVE_BLOCKER_SET, (_, active: boolean) => {
 Settings.addChangeListener("preventSleepInCalls", enabled => {
     if (!enabled) stop();
 });
+
+// System idle detection: Discord's idle logic polls this the same way the official client does.
+// https://github.com/Vencord/Vesktop/issues/396
+handle(IpcEvents.POWER_GET_SYSTEM_IDLE_TIME_MS, () => powerMonitor.getSystemIdleTime() * 1000);
+
+export const POWER_MONITOR_EVENTS = ["suspend", "resume", "lock-screen", "unlock-screen"] as const;
+export type PowerMonitorEvent = (typeof POWER_MONITOR_EVENTS)[number];
+
+for (const event of POWER_MONITOR_EVENTS) {
+    powerMonitor.on(event as any, () => {
+        for (const contents of webContents.getAllWebContents()) {
+            if (!contents.isDestroyed()) contents.send(IpcEvents.POWER_MONITOR_EVENT, event);
+        }
+    });
+}

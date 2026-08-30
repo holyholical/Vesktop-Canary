@@ -35,6 +35,7 @@ export const DefaultVesktopSettings: Settings = {
     blockTelemetry: true,
     clearCacheOnExit: false,
     preventSleepInCalls: true,
+    systemIdleDetection: true,
     autoUpdateVencord: true,
     proxy: {
         enabled: false,

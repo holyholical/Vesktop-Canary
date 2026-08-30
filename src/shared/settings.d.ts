@@ -48,6 +48,8 @@ export interface Settings {
     clearCacheOnExit: boolean;
     /** Keep the display awake while in a call or watching a stream */
     preventSleepInCalls: boolean;
+    /** Go idle based on system-wide input activity instead of activity inside the Discord window */
+    systemIdleDetection: boolean;
     /** Automatically download new Vencord releases on launch */
     autoUpdateVencord: boolean;
 

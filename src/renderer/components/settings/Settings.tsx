@@ -129,6 +129,12 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             description: "Disables smooth scrolling"
         },
         {
+            key: "systemIdleDetection",
+            title: "System idle detection",
+            description:
+                "Go idle based on keyboard and mouse activity anywhere on your system, like the official client, instead of only activity inside the Discord window. Requires a full restart."
+        },
+        {
             key: "preventSleepInCalls",
             title: "Keep display awake in calls",
             description: "Prevents the screen from sleeping while you are in a voice call or watching a stream"

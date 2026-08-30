@@ -7,6 +7,7 @@
 import type { Node } from "@vencord/venmic";
 import { ipcRenderer } from "electron/renderer";
 import type { IpcMessage, IpcResponse } from "main/ipcCommands";
+import type { PowerMonitorEvent } from "main/powerSave";
 import type { PlatformInfo } from "main/userAgent";
 import type { VencordUpdateResult } from "main/utils/vencordLoader";
 import type { Settings } from "shared/settings";
@@ -109,7 +110,11 @@ export const VesktopNative = {
     },
     power: {
         /** true while in a call or watching a stream; keeps the display awake if the setting is on */
-        setInCall: (active: boolean) => invoke<void>(IpcEvents.POWER_SAVE_BLOCKER_SET, active)
+        setInCall: (active: boolean) => invoke<void>(IpcEvents.POWER_SAVE_BLOCKER_SET, active),
+        getSystemIdleTimeMs: () => invoke<number>(IpcEvents.POWER_GET_SYSTEM_IDLE_TIME_MS),
+        onPowerMonitorEvent(cb: (event: PowerMonitorEvent) => void) {
+            ipcRenderer.on(IpcEvents.POWER_MONITOR_EVENT, (_, event: PowerMonitorEvent) => cb(event));
+        }
     },
     debug: {
         launchGpu: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_GPU),

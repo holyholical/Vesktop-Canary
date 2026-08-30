@@ -18,6 +18,7 @@ Vesktop-Canary is a fork of [Vesktop](https://github.com/Vencord/Vesktop) that s
 | Clear cache on exit | Settings > Privacy |
 | Login with token | Settings > Account |
 | Keep display awake in calls and while watching streams | Settings > Behaviour |
+| System-wide idle detection (no more AFK while you're active in another window) | Settings > Behaviour (on by default) |
 | "Open in Browser" menu (Ctrl+Shift+O) for links opened in-app | Windows opened via "Open Links in app" |
 | `--proxy-server <scheme://host:port>` | CLI, overrides the proxy setting for one session |
 
