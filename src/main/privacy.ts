@@ -38,6 +38,9 @@ const FAST_CONNECT_URL_PATTERNS = [
 
 const isFastConnectScript = (url: string) => /\/assets\/fast-connect[.-][^/]*\.js/.test(url);
 
+// An empty module the fast-connect script loader can import without erroring.
+const EMPTY_SCRIPT_URL = "data:text/javascript,export%20%7B%7D";
+
 function initRequestBlocking() {
     let blocked = 0;
 
@@ -45,10 +48,13 @@ function initRequestBlocking() {
         { urls: [...TELEMETRY_URL_PATTERNS, ...FAST_CONNECT_URL_PATTERNS] },
         (details, callback) => {
             if (isFastConnectScript(details.url)) {
-                const cancel = Settings.store.clientSpoof !== "web";
-                if (cancel)
-                    console.log("[Privacy] Blocked fast-connect script so client spoofing applies to the gateway");
-                return callback({ cancel });
+                // Redirect (not cancel) so the loader sees a successful, empty script and the page
+                // doesn't crash; this just stops the early un-spoofed gateway IDENTIFY.
+                if (Settings.store.clientSpoof !== "web") {
+                    console.log("[Privacy] Neutralising fast-connect so client spoofing applies to the gateway");
+                    return callback({ redirectURL: EMPTY_SCRIPT_URL });
+                }
+                return callback({});
             }
 
             if (!Settings.store.blockTelemetry) return callback({});
