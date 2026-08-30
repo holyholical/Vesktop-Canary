@@ -61,15 +61,6 @@ jobs:
                       git merge --abort
                   fi
 
-            - name: Keep Canary package name
-              if: steps.merge.outputs.clean == 'true'
-              run: |
-                  # upstream owns everything in package.json except the name; re-assert it
-                  sed -i 's/"name": "vesktop",/"name": "vesktop-canary",/' package.json
-                  if ! git diff --quiet; then
-                      git commit -am "chore: re-apply Canary package name after upstream sync"
-                  fi
-
             - uses: pnpm/action-setup@v4
               if: steps.merge.outputs.clean == 'true'
 
@@ -79,12 +70,21 @@ jobs:
                   node-version: 22
                   cache: pnpm
 
+            - name: Re-apply Canary branding
+              if: steps.merge.outputs.clean == 'true'
+              run: |
+                  pnpm install --frozen-lockfile
+                  pnpm applyBranding
+                  if ! git diff --quiet; then
+                      git commit -am "chore: re-apply Canary branding after upstream sync"
+                  fi
+
             - name: Verify merged tree builds
               if: steps.merge.outputs.clean == 'true'
               id: verify
               run: |
                   set +e
-                  pnpm install --frozen-lockfile && pnpm test && pnpm build
+                  pnpm test && pnpm build
                   echo "ok=$?" >> "$GITHUB_OUTPUT"
 
             - name: Push merge

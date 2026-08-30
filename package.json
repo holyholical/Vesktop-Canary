@@ -6,7 +6,7 @@
     "keywords": [],
     "homepage": "https://vencord.dev/",
     "license": "GPL-3.0-or-later",
-    "author": "Vendicated <vendicated@riseup.net>",
+    "author": "holyholical",
     "main": "dist/js/main.js",
     "scripts": {
         "build": "tsx scripts/build/build.mts",
@@ -19,6 +19,7 @@
         "start": "pnpm build && electron .",
         "start:dev": "pnpm build:dev && electron .",
         "start:watch": "pnpm build:dev && tsx scripts/startWatch.mts",
+        "applyBranding": "tsx scripts/utils/applyBranding.mts",
         "setup:musl": "tsx scripts/musl/setupElectron.mts",
         "start:musl": "pnpm build && .electron-musl/electron.sh .",
         "start:musl:dev": "pnpm build:dev && .electron-musl/electron.sh .",
@@ -69,9 +70,9 @@
         "pnpm": ">=11"
     },
     "build": {
-        "appId": "dev.vencord.vesktop",
-        "productName": "Vesktop",
-        "executableName": "vesktop",
+        "appId": "dev.vencord.vesktop-canary",
+        "productName": "Vesktop-Canary",
+        "executableName": "vesktop-canary",
         "files": [
             "!*",
             "!node_modules",
@@ -124,13 +125,13 @@
             ],
             "desktop": {
                 "entry": {
-                    "Name": "Vesktop",
+                    "Name": "Vesktop-Canary",
                     "GenericName": "Internet Messenger",
                     "Type": "Application",
                     "Categories": "Network;InstantMessaging;Chat;",
                     "Keywords": "discord;vencord;electron;chat;",
                     "MimeType": "x-scheme-handler/discord",
-                    "StartupWMClass": "vesktop"
+                    "StartupWMClass": "vesktop-canary"
                 }
             }
         },
@@ -219,5 +220,6 @@
             "loadBrowserProcessSpecificV8Snapshot": false,
             "grantFileProtocolExtraPrivileges": false
         }
-    }
+    },
+    "repository": "github:holyholical/Vesktop-Canary"
 }

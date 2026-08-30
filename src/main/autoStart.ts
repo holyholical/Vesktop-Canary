@@ -29,7 +29,7 @@ function getEscapedCommandLine() {
 function makeAutoStartLinuxDesktop(): AutoStart {
     const configDir = process.env.XDG_CONFIG_HOME || join(process.env.HOME!, ".config");
     const dir = join(configDir, "autostart");
-    const file = join(dir, "vesktop.desktop");
+    const file = join(dir, "vesktop-canary.desktop");
 
     return {
         isEnabled: () => existsSync(file),
@@ -37,12 +37,12 @@ function makeAutoStartLinuxDesktop(): AutoStart {
             const desktopFile = stripIndent`
                 [Desktop Entry]
                 Type=Application
-                Name=Vesktop
-                Comment=Vesktop autostart script
+                Name=Vesktop Canary
+                Comment=Vesktop Canary autostart script
                 Exec=${getEscapedCommandLine().join(" ")}
                 StartupNotify=false
                 Terminal=false
-                Icon=vesktop
+                Icon=vesktop-canary
             `;
 
             mkdirSync(dir, { recursive: true });
