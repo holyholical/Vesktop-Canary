@@ -159,6 +159,13 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
     Notifications: [
         NotificationBadgeToggle,
         {
+            key: "trayBadgeCount",
+            title: "Tray Mention Count",
+            description: "Show the number of mentions and pending friend requests on the tray icon",
+            invisible: () => isMac,
+            disabled: () => !Settings.store.appBadge || !Settings.store.tray
+        },
+        {
             key: "enableTaskbarFlashing",
             title: "Enable Taskbar Flashing",
             description: "Flashes the app in your taskbar when you have new notifications."

@@ -85,6 +85,12 @@ export const VesktopNative = {
             onDevtoolsClose = onClose;
         }
     },
+    tray: {
+        /** PNG data URL of the current unread tray icon, for the renderer to draw a count onto */
+        getIconDataUrl: () => invoke<string>(IpcEvents.TRAY_GET_ICON_DATA_URL),
+        /** null restores the plain icon */
+        setBadgeImage: (dataUrl: string | null) => invoke<void>(IpcEvents.TRAY_SET_BADGE_IMAGE, dataUrl)
+    },
     capturer: {
         getLargeThumbnail: (id: string) => invoke<string>(IpcEvents.CAPTURER_GET_LARGE_THUMBNAIL, id)
     },

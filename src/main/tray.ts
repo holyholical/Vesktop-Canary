@@ -4,31 +4,51 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { app, BrowserWindow, Menu, Tray } from "electron";
+import { app, BrowserWindow, Menu, NativeImage, nativeImage, Tray } from "electron";
+import { readFile } from "fs/promises";
+import { IpcEvents } from "shared/IpcEvents";
 
 import { createAboutWindow } from "./about";
 import { AppEvents } from "./events";
 import { Settings } from "./settings";
 import { resolveAssetPath } from "./userAssets";
 import { clearData } from "./utils/clearData";
+import { handle } from "./utils/ipcWrappers";
 import { downloadVencordFiles } from "./utils/vencordLoader";
 
 let tray: Tray;
 let trayVariant: "tray" | "trayUnread" = "tray";
+/** Renderer-drawn icon with the mention count on it, overrides the variant image while set */
+let badgeImage: NativeImage | null = null;
 
-AppEvents.on("userAssetChanged", async asset => {
-    if (tray && (asset === "tray" || asset === "trayUnread")) {
-        tray.setImage(await resolveAssetPath(trayVariant));
-    }
+async function refreshTrayImage() {
+    if (!tray) return;
+    tray.setImage(badgeImage ?? (await resolveAssetPath(trayVariant)));
+}
+
+AppEvents.on("userAssetChanged", asset => {
+    if (asset === "tray" || asset === "trayUnread") refreshTrayImage();
 });
 
-AppEvents.on("setTrayVariant", async variant => {
+AppEvents.on("setTrayVariant", variant => {
     if (trayVariant === variant) return;
 
     trayVariant = variant;
-    if (!tray) return;
+    if (variant === "tray") badgeImage = null;
+    refreshTrayImage();
+});
 
-    tray.setImage(await resolveAssetPath(trayVariant));
+handle(IpcEvents.TRAY_GET_ICON_DATA_URL, async () => {
+    const png = await readFile(await resolveAssetPath("trayUnread"));
+    return `data:image/png;base64,${png.toString("base64")}`;
+});
+
+handle(IpcEvents.TRAY_SET_BADGE_IMAGE, (_, dataUrl: string | null) => {
+    if (dataUrl !== null && !dataUrl.startsWith("data:image/png;base64,")) return;
+
+    badgeImage = dataUrl === null ? null : nativeImage.createFromDataURL(dataUrl);
+    if (badgeImage?.isEmpty()) badgeImage = null;
+    refreshTrayImage();
 });
 
 export function destroyTray() {
@@ -85,7 +105,7 @@ export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean)
         }
     ]);
 
-    tray = new Tray(await resolveAssetPath(trayVariant));
+    tray = new Tray(badgeImage ?? (await resolveAssetPath(trayVariant)));
     tray.setToolTip("Vesktop Canary");
     tray.setContextMenu(trayMenu);
     tray.on("click", onTrayClick);

@@ -29,6 +29,7 @@ export const DefaultVesktopSettings: Settings = {
     splashPixelated: false,
     webRTCIPHandlingPolicy: "default",
     appBadge: true,
+    trayBadgeCount: true,
     transparencyOption: "none",
 
     platformSpoof: "auto",

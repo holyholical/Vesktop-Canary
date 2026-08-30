@@ -27,6 +27,8 @@ export interface Settings {
     hardwareVideoAcceleration: boolean;
     arRPC: boolean;
     appBadge: boolean;
+    /** Draw the mention count on the tray icon */
+    trayBadgeCount: boolean;
     enableTaskbarFlashing: boolean;
     disableMinSize: boolean;
     clickTrayToShowHide: boolean;

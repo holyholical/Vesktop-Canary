@@ -16,7 +16,8 @@ Vesktop-Canary is a fork of [Vesktop](https://github.com/Vencord/Vesktop) that s
 | Telemetry blocking (science, track, metrics, Sentry) | Settings > Privacy (on by default) |
 | DNS over HTTPS (Quad9, Cloudflare, Mullvad, Google, custom) | Settings > Privacy |
 | Clear cache on exit | Settings > Privacy |
-| Login with token | Settings > Account |
+| Login with token | Button on the login page, and Settings > Account |
+| Mention count drawn on the tray icon | Settings > Notifications (on by default) |
 | Keep display awake in calls and while watching streams | Settings > Behaviour |
 | System-wide idle detection (no more AFK while you're active in another window) | Settings > Behaviour (on by default) |
 | "Open in Browser" menu (Ctrl+Shift+O) for links opened in-app | Windows opened via "Open Links in app" |

@@ -9,6 +9,7 @@ import { RelationshipStore } from "@vencord/types/webpack/common";
 
 import { VesktopLogger } from "./logger";
 import { Settings } from "./settings";
+import { updateTrayBadge } from "./trayBadge";
 
 let GuildReadStateStore: any;
 let NotificationSettingsStore: any;
@@ -26,6 +27,7 @@ export function setBadge() {
         if (!totalCount && hasUnread && !disableUnreadBadge) totalCount = -1;
 
         VesktopNative.app.setBadgeCount(totalCount);
+        updateTrayBadge(totalCount);
     } catch (e) {
         VesktopLogger.error("Failed to update badge count", e);
     }
@@ -42,6 +44,8 @@ function waitForAndSubscribeToStore(name: string, cb?: (m: any) => void) {
         if (toFind === 0) setBadge();
     });
 }
+
+Settings.addChangeListener("trayBadgeCount", () => setBadge());
 
 waitForAndSubscribeToStore("GuildReadStateStore", store => (GuildReadStateStore = store));
 waitForAndSubscribeToStore("NotificationSettingsStore", store => (NotificationSettingsStore = store));
