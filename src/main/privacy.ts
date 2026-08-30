@@ -26,18 +26,40 @@ const TELEMETRY_URL_PATTERNS = [
     "*://sentry.io/*"
 ];
 
-function initTelemetryBlocking() {
+/**
+ * Discord's "fast connect" script opens the gateway and sends IDENTIFY before the main bundle
+ * (and thus Vesktop's super properties patch) has loaded, so the session would be reported as web.
+ * Blocking it makes the client fall back to a normal connect.
+ */
+const FAST_CONNECT_URL_PATTERNS = [
+    "*://*.discord.com/assets/fast-connect.*.js",
+    "*://*.discord.com/assets/fast-connect-*.js"
+];
+
+const isFastConnectScript = (url: string) => /\/assets\/fast-connect[.-][^/]*\.js/.test(url);
+
+function initRequestBlocking() {
     let blocked = 0;
 
-    session.defaultSession.webRequest.onBeforeRequest({ urls: TELEMETRY_URL_PATTERNS }, (details, callback) => {
-        if (!Settings.store.blockTelemetry) return callback({});
+    session.defaultSession.webRequest.onBeforeRequest(
+        { urls: [...TELEMETRY_URL_PATTERNS, ...FAST_CONNECT_URL_PATTERNS] },
+        (details, callback) => {
+            if (isFastConnectScript(details.url)) {
+                const cancel = Settings.store.clientSpoof !== "web";
+                if (cancel)
+                    console.log("[Privacy] Blocked fast-connect script so client spoofing applies to the gateway");
+                return callback({ cancel });
+            }
 
-        if (IS_DEV && ++blocked % 25 === 1) {
-            console.log(`[Privacy] Blocked telemetry request (${blocked} so far):`, details.url);
+            if (!Settings.store.blockTelemetry) return callback({});
+
+            if (IS_DEV && ++blocked % 25 === 1) {
+                console.log(`[Privacy] Blocked telemetry request (${blocked} so far):`, details.url);
+            }
+
+            callback({ cancel: true });
         }
-
-        callback({ cancel: true });
-    });
+    );
 }
 
 const DOH_MODE_OFF = "off" as const;
@@ -129,7 +151,7 @@ export function applyLocaleAndTimezoneSpoof() {
 
 /** Must be called after app is ready */
 export function initPrivacy() {
-    initTelemetryBlocking();
+    initRequestBlocking();
     initDnsOverHttps();
     initClearOnExit();
 }
