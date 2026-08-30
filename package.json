@@ -21,6 +21,7 @@
         "start:watch": "pnpm build:dev && tsx scripts/startWatch.mts",
         "applyBranding": "tsx scripts/utils/applyBranding.mts",
         "setup:musl": "tsx scripts/musl/setupElectron.mts",
+        "install:musl": "sh scripts/musl/install.sh",
         "start:musl": "pnpm build && .electron-musl/electron.sh .",
         "start:musl:dev": "pnpm build:dev && .electron-musl/electron.sh .",
         "test": "pnpm lint && pnpm testTypes",
