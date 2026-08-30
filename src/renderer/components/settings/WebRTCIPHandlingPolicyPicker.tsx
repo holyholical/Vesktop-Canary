@@ -8,7 +8,7 @@ import { Heading, Margins, Paragraph } from "@vencord/types/components";
 import { Select } from "@vencord/types/webpack/common";
 
 import { SimpleErrorBoundary } from "../SimpleErrorBoundary";
-import { SettingsComponent } from "./Settings";
+import { SettingsComponent } from "./shared";
 
 export const WebRTCIPHandlingPolicyPicker: SettingsComponent = ({ settings }) => {
     return (

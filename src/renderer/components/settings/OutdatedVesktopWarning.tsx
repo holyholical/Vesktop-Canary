@@ -7,7 +7,7 @@
 import { Button, Card, HeadingTertiary, Paragraph } from "@vencord/types/components";
 import { useAwaiter } from "@vencord/types/utils";
 
-import { cl } from "./Settings";
+import { cl } from "./shared";
 
 export function OutdatedVesktopWarning() {
     const [isOutdated] = useAwaiter(VesktopNative.app.isOutdated);

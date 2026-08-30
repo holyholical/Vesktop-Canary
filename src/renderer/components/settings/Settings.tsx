@@ -6,9 +6,7 @@
 
 import "./settings.css";
 
-import { classNameFactory } from "@vencord/types/api/Styles";
 import { BaseText, Divider, ErrorBoundary } from "@vencord/types/components";
-import { ComponentType } from "react";
 import { WebRTCIPHandlingPolicyPicker } from "renderer/components/settings/WebRTCIPHandlingPolicyPicker";
 import { getValueAndOnChange, Settings, useSettings } from "renderer/settings";
 import { isMac } from "renderer/utils";
@@ -36,9 +34,9 @@ interface BooleanSetting {
     invisible?(): boolean;
 }
 
-export const cl = classNameFactory("vcd-settings-");
+import { cl, SettingsComponent } from "./shared";
 
-export type SettingsComponent = ComponentType<{ settings: typeof Settings.store }>;
+export { cl, type SettingsComponent };
 
 const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>> = {
     "Discord Branch": [DiscordBranchPicker],

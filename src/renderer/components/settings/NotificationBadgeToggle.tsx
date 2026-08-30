@@ -6,7 +6,7 @@
 
 import { setBadge } from "renderer/appBadge";
 
-import { SettingsComponent } from "./Settings";
+import { SettingsComponent } from "./shared";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 
 export const NotificationBadgeToggle: SettingsComponent = ({ settings }) => {

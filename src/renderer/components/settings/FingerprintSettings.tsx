@@ -8,7 +8,7 @@ import { Heading, Margins, Paragraph } from "@vencord/types/components";
 import { TextInput } from "@vencord/types/webpack/common";
 
 import { SimpleErrorBoundary } from "../SimpleErrorBoundary";
-import { SettingsComponent } from "./Settings";
+import { SettingsComponent } from "./shared";
 
 const TIMEZONE_PATTERN = /^[A-Za-z_]+(?:\/[A-Za-z0-9_+-]+){0,2}$/;
 const LOCALE_PATTERN = /^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/;

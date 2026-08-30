@@ -8,7 +8,7 @@ import { Heading, Margins, Paragraph } from "@vencord/types/components";
 import { Select, TextInput } from "@vencord/types/webpack/common";
 
 import { SimpleErrorBoundary } from "../SimpleErrorBoundary";
-import { SettingsComponent } from "./Settings";
+import { SettingsComponent } from "./shared";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 
 const CUSTOM = "custom";

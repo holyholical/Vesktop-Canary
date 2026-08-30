@@ -12,7 +12,7 @@ import { Modal, openModal, showToast, useState } from "@vencord/types/webpack/co
 import { UserAssetType } from "main/userAssets";
 import { useSettings } from "renderer/settings";
 
-import { SettingsComponent } from "./Settings";
+import { SettingsComponent } from "./shared";
 
 const CUSTOMIZABLE_ASSETS: UserAssetType[] = ["splash", "tray", "trayUnread"];
 

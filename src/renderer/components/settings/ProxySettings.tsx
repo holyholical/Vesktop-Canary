@@ -8,7 +8,7 @@ import { Button, Heading, Margins, Paragraph } from "@vencord/types/components";
 import { TextInput, Toasts, useState } from "@vencord/types/webpack/common";
 
 import { SimpleErrorBoundary } from "../SimpleErrorBoundary";
-import { cl, SettingsComponent } from "./Settings";
+import { cl, SettingsComponent } from "./shared";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 
 const PROXY_URL_PATTERN = /^(https?|socks[45]?):\/\/\S+$/i;

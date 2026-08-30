@@ -9,7 +9,7 @@ import { Margins } from "@vencord/types/utils";
 import { Select } from "@vencord/types/webpack/common";
 
 import { SimpleErrorBoundary } from "../SimpleErrorBoundary";
-import { SettingsComponent } from "./Settings";
+import { SettingsComponent } from "./shared";
 
 export const WindowsTransparencyControls: SettingsComponent = ({ settings }) => {
     if (!VesktopNative.app.supportsWindowsTransparency()) return null;

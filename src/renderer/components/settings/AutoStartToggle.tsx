@@ -6,7 +6,7 @@
 
 import { useState } from "@vencord/types/webpack/common";
 
-import { SettingsComponent } from "./Settings";
+import { SettingsComponent } from "./shared";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 
 export const AutoStartToggle: SettingsComponent = ({ settings }) => {

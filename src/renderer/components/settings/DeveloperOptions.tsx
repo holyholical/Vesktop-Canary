@@ -9,7 +9,7 @@ import { Margins, useForceUpdater } from "@vencord/types/utils";
 import { Modal, openModal, Toasts } from "@vencord/types/webpack/common";
 import { Settings } from "shared/settings";
 
-import { cl, SettingsComponent } from "./Settings";
+import { cl, SettingsComponent } from "./shared";
 
 export const DeveloperOptionsButton: SettingsComponent = ({ settings }) => {
     return <Button onClick={() => openDeveloperOptionsModal(settings)}>Open Developer Settings</Button>;

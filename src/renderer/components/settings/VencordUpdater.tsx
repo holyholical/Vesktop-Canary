@@ -7,7 +7,7 @@
 import { Button, Heading, Margins, Paragraph } from "@vencord/types/components";
 import { Toasts, useState } from "@vencord/types/webpack/common";
 
-import { cl, SettingsComponent } from "./Settings";
+import { cl, SettingsComponent } from "./shared";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 
 export const VencordUpdater: SettingsComponent = ({ settings }) => {

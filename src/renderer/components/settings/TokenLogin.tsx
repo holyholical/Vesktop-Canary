@@ -8,7 +8,7 @@ import { Button, Heading, Margins, Paragraph } from "@vencord/types/components";
 import { Modal, openModal, TextInput, useState } from "@vencord/types/webpack/common";
 import { localStorage } from "renderer/utils";
 
-import { cl, SettingsComponent } from "./Settings";
+import { cl, SettingsComponent } from "./shared";
 
 // Discord tokens are base64 user id . base64 timestamp . hmac. Anything with whitespace or quotes is wrong.
 const TOKEN_PATTERN = /^[\w-]+\.[\w-]+\.[\w-]+$/;

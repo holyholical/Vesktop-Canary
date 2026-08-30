@@ -7,7 +7,7 @@
 import { Select } from "@vencord/types/webpack/common";
 
 import { SimpleErrorBoundary } from "../SimpleErrorBoundary";
-import { SettingsComponent } from "./Settings";
+import { SettingsComponent } from "./shared";
 
 export const DiscordBranchPicker: SettingsComponent = ({ settings }) => {
     return (
