@@ -9,8 +9,11 @@ on:
 jobs:
     release:
         runs-on: ${{ matrix.os }}
+        env:
+            APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
 
         strategy:
+            fail-fast: false
             matrix:
                 os: [macos-latest, ubuntu-latest, windows-latest]
                 include:
@@ -44,8 +47,16 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Run Electron Builder
-              if: ${{ matrix.platform == 'mac' }}
+            # Unsigned, un-notarized mac build when no Apple credentials are configured
+            - name: Run Electron Builder (mac, unsigned)
+              if: ${{ matrix.platform == 'mac' && env.APPLE_API_KEY_ID == '' }}
+              run: pnpm electron-builder --mac --publish always --config.mac.notarize=false
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  CSC_IDENTITY_AUTO_DISCOVERY: false
+
+            - name: Run Electron Builder (mac, signed)
+              if: ${{ matrix.platform == 'mac' && env.APPLE_API_KEY_ID != '' }}
               run: |
                   echo "$API_KEY" > apple.p8
                   pnpm electron-builder --${{ matrix.platform }} --publish always
