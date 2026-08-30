@@ -61,6 +61,11 @@ const extraOptions = {
         description: "Disable specific Chromium features",
         argumentName: "feature1,feature2,…"
     },
+    "proxy-server": {
+        type: "string",
+        argumentName: "scheme://host:port",
+        description: "Route all traffic through a proxy for this session. Overrides the proxy setting"
+    },
     "ozone-platform": {
         hidden: process.platform !== "linux",
         type: "string",

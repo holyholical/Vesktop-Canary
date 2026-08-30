@@ -29,5 +29,20 @@ export const DefaultVesktopSettings: Settings = {
     splashPixelated: false,
     webRTCIPHandlingPolicy: "default",
     appBadge: true,
-    transparencyOption: "none"
+    transparencyOption: "none",
+
+    platformSpoof: "auto",
+    blockTelemetry: true,
+    clearCacheOnExit: false,
+    preventSleepInCalls: true,
+    autoUpdateVencord: true,
+    proxy: {
+        enabled: false,
+        url: "",
+        bypassRules: "<local>"
+    },
+    dnsOverHttps: {
+        enabled: false,
+        server: "https://dns.quad9.net/dns-query"
+    }
 };

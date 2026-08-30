@@ -14,8 +14,9 @@ export const isFirstRun = (() => {
     return true;
 })();
 
-const { platform } = navigator;
+// Use the real platform from the main process, not navigator.platform, which may be spoofed
+const { platform } = VesktopNative.app.getPlatformInfo();
 
-export const isWindows = platform.startsWith("Win");
-export const isMac = platform.startsWith("Mac");
-export const isLinux = platform.startsWith("Linux");
+export const isWindows = platform === "win32";
+export const isMac = platform === "darwin";
+export const isLinux = platform === "linux";

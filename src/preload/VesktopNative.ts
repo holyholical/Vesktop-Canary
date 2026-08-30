@@ -7,6 +7,8 @@
 import type { Node } from "@vencord/venmic";
 import { ipcRenderer } from "electron/renderer";
 import type { IpcMessage, IpcResponse } from "main/ipcCommands";
+import type { PlatformInfo } from "main/userAgent";
+import type { VencordUpdateResult } from "main/utils/vencordLoader";
 import type { Settings } from "shared/settings";
 
 import { IpcEvents } from "../shared/IpcEvents";
@@ -30,6 +32,7 @@ export const VesktopNative = {
     app: {
         relaunch: () => invoke<void>(IpcEvents.RELAUNCH),
         getVersion: () => sendSync<void>(IpcEvents.GET_VERSION),
+        getPlatformInfo: () => sendSync<PlatformInfo>(IpcEvents.GET_PLATFORM_INFO),
         setBadgeCount: (count: number) => invoke<void>(IpcEvents.SET_BADGE_COUNT, count),
         supportsWindowsTransparency: () => sendSync<boolean>(IpcEvents.SUPPORTS_WINDOWS_TRANSPARENCY),
         getEnableHardwareAcceleration: () => sendSync<boolean>(IpcEvents.GET_ENABLE_HARDWARE_ACCELERATION),
@@ -97,6 +100,16 @@ export const VesktopNative = {
     clipboard: {
         copyImage: (imageBuffer: Uint8Array, imageSrc: string) =>
             invoke<void>(IpcEvents.CLIPBOARD_COPY_IMAGE, imageBuffer, imageSrc)
+    },
+    proxy: {
+        test: () => invoke<Awaited<ReturnType<typeof import("main/proxy").testProxy>>>(IpcEvents.PROXY_TEST)
+    },
+    vencord: {
+        checkUpdate: () => invoke<VencordUpdateResult>(IpcEvents.VENCORD_CHECK_UPDATE)
+    },
+    power: {
+        /** true while in a call or watching a stream; keeps the display awake if the setting is on */
+        setInCall: (active: boolean) => invoke<void>(IpcEvents.POWER_SAVE_BLOCKER_SET, active)
     },
     debug: {
         launchGpu: () => invoke<void>(IpcEvents.DEBUG_LAUNCH_GPU),

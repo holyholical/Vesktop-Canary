@@ -9,6 +9,7 @@ import "./updater";
 import "./ipc";
 import "./userAssets";
 import "./vesktopProtocol";
+import "./powerSave";
 
 import { app, BrowserWindow, nativeTheme } from "electron";
 
@@ -16,8 +17,11 @@ import { DATA_DIR } from "./constants";
 import { createFirstLaunchTour } from "./firstLaunch";
 import { createWindows, mainWin } from "./mainWindow";
 import { registerMediaPermissionsHandler } from "./mediaPermissions";
+import { initPrivacy } from "./privacy";
+import { initProxy } from "./proxy";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
+import { initUserAgent } from "./userAgent";
 import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
 import { isDeckGameMode } from "./utils/steamOS";
 
@@ -120,6 +124,9 @@ function init() {
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
+        initUserAgent();
+        initPrivacy();
+        await initProxy();
 
         bootstrap();
 

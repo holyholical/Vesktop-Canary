@@ -10,6 +10,7 @@ import { VENCORD_FILES_DIR } from "main/vencordFilesDir";
 import { join } from "path";
 
 import { USER_AGENT } from "../constants";
+import { Settings, State } from "../settings";
 import { downloadFile, fetchie } from "./http";
 
 const API_BASE = "https://api.github.com";
@@ -44,10 +45,13 @@ export async function githubGet(endpoint: string) {
     return fetchie(API_BASE + endpoint, opts, { retryOnNetworkError: true });
 }
 
-export async function downloadVencordFiles() {
+async function fetchLatestRelease(): Promise<ReleaseData> {
     const release = await githubGet("/repos/Vendicated/Vencord/releases/latest");
+    return release.json();
+}
 
-    const { assets }: ReleaseData = await release.json();
+export async function downloadVencordFiles(release?: ReleaseData) {
+    const { assets, tag_name } = release ?? (await fetchLatestRelease());
 
     await Promise.all(
         assets
@@ -56,6 +60,38 @@ export async function downloadVencordFiles() {
                 downloadFile(browser_download_url, join(VENCORD_FILES_DIR, name), {}, { retryOnNetworkError: true })
             )
     );
+
+    State.store.vencordVersion = tag_name;
+}
+
+export type VencordUpdateResult =
+    | { status: "up-to-date"; version: string }
+    | { status: "updated"; from?: string; to: string }
+    | { status: "skipped"; reason: string }
+    | { status: "error"; error: string };
+
+/**
+ * Downloads the newest Vencord release if it is newer than the one on disk.
+ * New files take effect on the next launch. Custom Vencord dirs are never touched.
+ */
+export async function checkVencordUpdate(force = false): Promise<VencordUpdateResult> {
+    if (State.store.vencordDir) return { status: "skipped", reason: "custom Vencord directory in use" };
+    if (!force && !Settings.store.autoUpdateVencord) return { status: "skipped", reason: "auto update disabled" };
+
+    try {
+        const release = await fetchLatestRelease();
+        const current = State.store.vencordVersion;
+
+        if (current === release.tag_name) return { status: "up-to-date", version: current };
+
+        await downloadVencordFiles(release);
+        console.log(`[VencordLoader] Updated Vencord ${current ?? "(unknown)"} -> ${release.tag_name}`);
+
+        return { status: "updated", from: current, to: release.tag_name };
+    } catch (err) {
+        console.error("[VencordLoader] Failed to check for Vencord update:", err);
+        return { status: "error", error: err instanceof Error ? err.message : String(err) };
+    }
 }
 
 const existsAsync = (path: string) =>

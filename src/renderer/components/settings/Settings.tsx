@@ -16,9 +16,14 @@ import { isMac } from "renderer/utils";
 import { AutoStartToggle } from "./AutoStartToggle";
 import { DeveloperOptionsButton } from "./DeveloperOptions";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
+import { DnsOverHttpsSettings } from "./DnsOverHttpsSettings";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
 import { OutdatedVesktopWarning } from "./OutdatedVesktopWarning";
+import { PlatformSpoofPicker } from "./PlatformSpoofPicker";
+import { ProxySettings } from "./ProxySettings";
+import { TokenLoginButton } from "./TokenLogin";
 import { UserAssetsButton } from "./UserAssets";
+import { VencordUpdater } from "./VencordUpdater";
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 
@@ -122,8 +127,29 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             key: "disableSmoothScroll",
             title: "Disable smooth scrolling",
             description: "Disables smooth scrolling"
+        },
+        {
+            key: "preventSleepInCalls",
+            title: "Keep display awake in calls",
+            description: "Prevents the screen from sleeping while you are in a voice call or watching a stream"
         }
     ],
+    Privacy: [
+        {
+            key: "blockTelemetry",
+            title: "Block Telemetry",
+            description: "Blocks Discord analytics (science, track, metrics) and Sentry crash reports"
+        },
+        {
+            key: "clearCacheOnExit",
+            title: "Clear cache on exit",
+            description: "Wipes cached images, media and scripts when Vesktop quits. Login stays intact."
+        },
+        PlatformSpoofPicker,
+        ProxySettings,
+        DnsOverHttpsSettings
+    ],
+    Account: [TokenLoginButton],
     Notifications: [
         NotificationBadgeToggle,
         {
@@ -145,7 +171,8 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             description: "Opens links in a new Vesktop window instead of your web browser"
         },
 
-        WebRTCIPHandlingPolicyPicker
+        WebRTCIPHandlingPolicyPicker,
+        VencordUpdater
     ],
 
     "Developer Options": [DeveloperOptionsButton]

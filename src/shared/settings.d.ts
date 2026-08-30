@@ -40,6 +40,31 @@ export interface Settings {
 
     spellCheckLanguages?: string[];
 
+    /** Which OS Discord should think it is running on. "auto" uses the real platform */
+    platformSpoof: "auto" | "windows" | "linux" | "darwin";
+    /** Block Discord analytics (science/track/metrics) and Sentry crash reports */
+    blockTelemetry: boolean;
+    /** Wipe the HTTP cache when Vesktop exits */
+    clearCacheOnExit: boolean;
+    /** Keep the display awake while in a call or watching a stream */
+    preventSleepInCalls: boolean;
+    /** Automatically download new Vencord releases on launch */
+    autoUpdateVencord: boolean;
+
+    proxy: {
+        enabled: boolean;
+        /** e.g. socks5://127.0.0.1:9050 or http://user:pass@proxy:3128 */
+        url: string;
+        /** Chromium bypass rules, comma separated */
+        bypassRules: string;
+    };
+
+    dnsOverHttps: {
+        enabled: boolean;
+        /** DoH template URL */
+        server: string;
+    };
+
     audio?: {
         workaround?: boolean;
 
@@ -66,6 +91,8 @@ export interface State {
     linuxAutoStartEnabled?: boolean;
 
     vencordDir?: string;
+    /** Release tag of the currently downloaded Vencord files */
+    vencordVersion?: string;
 
     updater?: {
         ignoredVersion?: string;

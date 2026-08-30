@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { BrowserWindow, shell } from "electron";
+import { BrowserWindow, Menu, shell } from "electron";
 import { DISCORD_HOSTNAMES } from "main/constants";
 
 import { Settings } from "../settings";
@@ -47,6 +47,29 @@ export function handleExternalUrl(url: string, protocol?: string): { action: "de
     return { action: "deny" };
 }
 
+/**
+ * Windows opened via "Open Links in app" get a small menu so the page can still
+ * be handed off to the real browser. https://github.com/Vencord/Vesktop/issues/1097
+ */
+function setupExternalLinkWindow(win: BrowserWindow) {
+    const openInBrowser = () => {
+        const url = win.webContents.getURL();
+        if (url && url !== "about:blank") shell.openExternal(url);
+    };
+
+    win.setMenu(
+        Menu.buildFromTemplate([
+            { label: "Open in Browser", accelerator: "CmdOrCtrl+Shift+O", click: openInBrowser },
+            { label: "Back", accelerator: "Alt+Left", click: () => win.webContents.navigationHistory.goBack() },
+            { label: "Reload", accelerator: "CmdOrCtrl+R", click: () => win.webContents.reload() }
+        ])
+    );
+    win.setMenuBarVisibility(true);
+    win.setAutoHideMenuBar(false);
+
+    win.webContents.setWindowOpenHandler(({ url }) => handleExternalUrl(url));
+}
+
 export function makeLinksOpenExternally(win: BrowserWindow) {
     win.webContents.setWindowOpenHandler(({ url, frameName, features }) => {
         try {
@@ -69,5 +92,6 @@ export function makeLinksOpenExternally(win: BrowserWindow) {
 
     win.webContents.on("did-create-window", (win, { frameName }) => {
         if (frameName.startsWith("DISCORD_")) setupPopout(win, frameName);
+        else setupExternalLinkWindow(win);
     });
 }

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { app, net } from "electron";
 import { createWriteStream } from "fs";
 import { Readable } from "stream";
 import { pipeline } from "stream/promises";
@@ -26,11 +27,20 @@ export async function downloadFile(url: string, file: string, options: RequestIn
 
 const ONE_MINUTE_MS = 1000 * 60;
 
+/**
+ * Electron's net.fetch goes through Chromium's network stack, so it honours the
+ * session proxy and DNS settings. It is only available once the app is ready,
+ * so fall back to Node's fetch before that (e.g. for --repair).
+ */
+function doFetch(url: string, options?: RequestInit): Promise<Response> {
+    return app.isReady() ? net.fetch(url, options) : fetch(url, options);
+}
+
 export async function fetchie(url: string, options?: RequestInit, { retryOnNetworkError }: FetchieOptions = {}) {
     let res: Response | undefined;
 
     try {
-        res = await fetch(url, options);
+        res = await doFetch(url, options);
     } catch (err) {
         if (retryOnNetworkError) {
             console.error("Failed to fetch", url + ".", "Gonna retry with backoff.");
@@ -38,7 +48,7 @@ export async function fetchie(url: string, options?: RequestInit, { retryOnNetwo
             for (let tries = 0, delayMs = 500; tries < 20; tries++, delayMs = Math.min(2 * delayMs, ONE_MINUTE_MS)) {
                 await setTimeout(delayMs);
                 try {
-                    res = await fetch(url, options);
+                    res = await doFetch(url, options);
                     break;
                 } catch {}
             }

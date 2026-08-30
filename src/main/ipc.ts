@@ -28,11 +28,13 @@ import { setBadgeCount } from "./appBadge";
 import { autoStart } from "./autoStart";
 import { enableHardwareAcceleration } from "./main";
 import { mainWin } from "./mainWindow";
+import { testProxy } from "./proxy";
 import { Settings, State } from "./settings";
+import { getPlatformInfo } from "./userAgent";
 import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
-import { isValidVencordInstall } from "./utils/vencordLoader";
+import { checkVencordUpdate, isValidVencordInstall } from "./utils/vencordLoader";
 import { VENCORD_FILES_DIR } from "./vencordFilesDir";
 
 handleSync(IpcEvents.GET_VENCORD_PRELOAD_SCRIPT, () =>
@@ -57,6 +59,9 @@ if (IS_DEV) {
 }
 
 handleSync(IpcEvents.GET_SETTINGS, () => Settings.plain);
+handleSync(IpcEvents.GET_PLATFORM_INFO, () => getPlatformInfo());
+handle(IpcEvents.PROXY_TEST, () => testProxy());
+handle(IpcEvents.VENCORD_CHECK_UPDATE, () => checkVencordUpdate(true));
 handleSync(IpcEvents.GET_VERSION, () => app.getVersion());
 handleSync(IpcEvents.GET_ENABLE_HARDWARE_ACCELERATION, () => enableHardwareAcceleration);
 
