@@ -200,7 +200,9 @@
             ]
         },
         "publish": {
-            "provider": "github"
+            "provider": "github",
+            "owner": "holyholical",
+            "repo": "Vesktop-Canary"
         },
         "rpm": {
             "fpm": [
