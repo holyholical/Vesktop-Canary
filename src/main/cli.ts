@@ -42,6 +42,10 @@ const options = {
         type: "string",
         description: "Set User-Agent to a specific operating system. May trigger anti-spam or break voice chat",
         options: ["windows", "linux", "darwin"]
+    },
+    repair: {
+        type: "boolean",
+        description: "Repair the application by re-downloading the latest Vencord files"
     }
 } satisfies Record<string, Option>;
 
@@ -80,13 +84,13 @@ export function checkCommandLineForHelpOrVersion() {
     const { help, version } = CommandLine.values;
 
     if (version) {
-        console.log(`Vesktop v${app.getVersion()}`);
+        console.log(`Vesktop Canary v${app.getVersion()}`);
         app.exit(0);
     }
 
     if (help) {
         const base = stripIndent`
-            Vesktop v${app.getVersion()}
+            Vesktop Canary v${app.getVersion()}
 
             Usage: ${basename(process.execPath)} [options] [url]
 

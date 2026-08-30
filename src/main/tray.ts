@@ -53,7 +53,7 @@ export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean)
             click: createAboutWindow
         },
         {
-            label: "Repair Vencord Canary",
+            label: "Repair Vencord",
             async click() {
                 await downloadVencordFiles();
                 app.relaunch();
