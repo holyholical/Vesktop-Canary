@@ -41,7 +41,7 @@ export const TokenLoginButton: SettingsComponent = () => {
     );
 };
 
-function openTokenLoginModal() {
+export function openTokenLoginModal() {
     openModal(props => <TokenLoginModal {...props} />);
 }
 
@@ -53,7 +53,7 @@ function TokenLoginModal(props: { onClose(): void; transitionState: any }) {
     const error = trimmed && !isPlausibleToken(trimmed) ? "That does not look like a Discord token" : undefined;
 
     return (
-        <Modal {...props} size="md" title="Login with Token">
+        <Modal {...props} size="sm" title="Login with Token">
             <Paragraph className={Margins.bottom8}>
                 Never share your token. Anyone who has it has full access to your account.
             </Paragraph>
