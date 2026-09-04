@@ -92,6 +92,7 @@ export interface Settings {
         ignoreDevices?: boolean;
         ignoreInputMedia?: boolean;
 
+        mute?: boolean;
         onlySpeakers?: boolean;
         onlyDefaultSpeakers?: boolean;
     };
