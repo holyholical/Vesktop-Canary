@@ -442,6 +442,12 @@ function createMainWindow() {
     initDevtoolsListeners(win);
     initStaticTitle(win);
 
+<<<<<<< HEAD
+=======
+    win.webContents.session.setUserAgent(BrowserUserAgent);
+    win.webContents.setUserAgent(BrowserUserAgent);
+
+>>>>>>> 88141bb4e9f2d0df6375c0ef6e87cc9d2385ab24
     // if the open-url event is fired (in index.ts) while starting up, darwinURL will be set. If not fall back to checking the process args (which Windows and Linux use for URI calling.)
     // win.webContents.session.clearCache().then(() => {
     loadUrl(darwinURL || process.argv.find(arg => arg.startsWith("discord://")));
